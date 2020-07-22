@@ -23,7 +23,7 @@ class PlayPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 //    var hugeStyle = Theme.of(context).textTheme.headline1.copyWith(fontSize: 48);
-    //var trace = Provider.of<TraceModel>(context);
+    var playList = Provider.of<PlayListViewModel>(context);
 
     return SizedBox(
       height: 200,
@@ -104,8 +104,8 @@ class PlayPanel extends StatelessWidget {
 
                   Consumer<PlayerViewModel>(
                     builder: (context, player, child) => IconButton(
-                        onPressed: player.canPlay ? (() {
-                          player.isPlaying?player.pause():player.play();
+                        onPressed: playList.canPlay() ? (() {
+                          playList.playOrPause();
                         }) : null,
                         iconSize: 64.0,
                         icon: Icon(player.isPlaying?Icons.pause_circle_filled:Icons.play_circle_filled),   //Icons.pause_circle_filled

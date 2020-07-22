@@ -20,10 +20,14 @@ class PlayListPage extends StatefulWidget {
 class _PlayListPageState extends State<PlayListPage> {
   PlayerViewModel _playerModel = serviceLocator<PlayerViewModel>();
   PlayListViewModel _playListModel = serviceLocator<PlayListViewModel>();
+  TextEditingController _controller;
+  bool _isListNameEditing = false;    // 是否是在编辑播放列表的名字
 
   @override
   void initState() {
     _playListModel.loadFromConfig();
+    _controller = TextEditingController();
+    _isListNameEditing = false;
     super.initState();
   }
 
@@ -33,6 +37,13 @@ class _PlayListPageState extends State<PlayListPage> {
       providers: [
         ChangeNotifierProvider(create: (_) => _playerModel),
         ChangeNotifierProvider(create: (_) => _playListModel),
+//        ChangeNotifierProxyProvider<PlayerViewModel, PlayListViewModel>(
+//          create: (_) => _playListModel,
+//          update: (_,  player,  playList) {
+//            print('*** ChangeNotifierProxyProvider update() *****');
+//            return _playListModel;
+//          },
+//        ),
       ],
       child: Scaffold(
         appBar: AppBar(
@@ -42,9 +53,7 @@ class _PlayListPageState extends State<PlayListPage> {
             onPressed: null,
           ),
           title: Consumer<PlayListViewModel>(
-            builder: (context, playList, child) => Text(
-              '${playList.name}'
-            ),
+            builder: (context, playList, child) => _buidAppBarTitle(playList),
           ),
           actions: <Widget>[
             IconButton(
@@ -75,6 +84,41 @@ class _PlayListPageState extends State<PlayListPage> {
 
   }
 
+  Widget _buidAppBarTitle(PlayListViewModel playList) {
+    if(_isListNameEditing) {
+      _controller.text = playList.name;
+      return TextField(
+        decoration: InputDecoration(
+          border: OutlineInputBorder(),
+          focusColor: Colors.white,
+          fillColor: Colors.white,
+          filled: true,
+        ),
+        autofocus: true,
+        controller: _controller,
+        onChanged: (text) {
+          print("text field onChanged: $text");
+        },
+        onSubmitted: (String text) {
+          print("text field onSubmitted: $text");
+          setState(() {
+            playList.changeName(_controller.text.trim());
+            _isListNameEditing = false;
+          });
+        },
+      );
+    } else {
+      return GestureDetector(
+        onTap: () {
+          setState(() {
+            _isListNameEditing = true;
+          });
+        },
+        child: Text(playList.name),
+      );
+    }
+  }
+
   Future _addToPlayList() async {
     var path;
     try {
@@ -96,7 +140,6 @@ class _PlayListPageState extends State<PlayListPage> {
 class _PlayListView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-//    var itemNameStyle = Theme.of(context).textTheme.headline6;
     var itemNameStyle = Theme.of(context).textTheme.bodyText2;
     var activedItemNameStyle = Theme.of(context).textTheme.bodyText1;
     var _playList = Provider.of<PlayListViewModel>(context);

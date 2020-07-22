@@ -22,9 +22,10 @@ class PlayListItem {
 
 class PlayList {
   String name;
+  String filePath;
   final List<PlayListItem> _traces;
 
-  PlayList(this.name, this._traces);
+  PlayList(this.filePath, this.name, this._traces);
 
   List<PlayListItem> get traces => _traces;
 

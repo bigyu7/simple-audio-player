@@ -14,7 +14,7 @@ class PlayListViewModel extends ChangeNotifier implements PlayListInterface {
   final List<PlayStrategy> _playStrategys = [];
 
   PlayList _playList;
-  String _playListFilePath;
+  //String _playListFilePath;
 
   int _currentTraceIndex;
   PlayMode _playMode;
@@ -29,6 +29,8 @@ class PlayListViewModel extends ChangeNotifier implements PlayListInterface {
 
   List<PlayListItem> get traces => _playList==null?[]:_playList.traces;
   String get name => _playList==null?'':_playList.name;
+
+  get isPlaying => _playerViewModel.isPlaying;
 
   @override
   int tracesCount() => _playList==null?0:_playList.tracesCount;
@@ -57,7 +59,6 @@ class PlayListViewModel extends ChangeNotifier implements PlayListInterface {
   }
 
   Future<PlayList> _loadPlayListFromFile(String playListFilePath) async {
-    _playListFilePath = playListFilePath;
     _playList = await _playListStorageService.loadPlayList(playListFilePath);
     notifyListeners();
     return _playList;
@@ -76,8 +77,19 @@ class PlayListViewModel extends ChangeNotifier implements PlayListInterface {
   Future _saveConfig() async {
     Config config = Config();
     config.playMode = this.playMode;
-    config.playListFilePath = _playListFilePath;
+    config.playListFilePath = _playList.filePath;
     await _configStorageService.saveConfig(config);
+  }
+
+  Future changeName(String newName) async {
+    if(newName==null||newName.isEmpty||newName==_playList.name) return;
+    //_playList.name=newName;
+
+    print('** changeName() - '+_playList.name+' => '+newName);
+
+    await _playListStorageService.renamePlayList(_playList, newName);
+    await _saveConfig();
+    notifyListeners();
   }
 
   void playIndex(int index) {
@@ -121,6 +133,16 @@ class PlayListViewModel extends ChangeNotifier implements PlayListInterface {
 
   bool canPlay() => playStrategy.canPlay();
 
-
+  void playOrPause() {
+    if(_playerViewModel.isPlaying) {
+      _playerViewModel.pause();
+    } else if(_playerViewModel.isPaused) {
+      _playerViewModel.play();
+    } else if(_playerViewModel.canPlay)  {
+      _playerViewModel.play();
+    } else {
+      play();
+    }
+  }
 
 }

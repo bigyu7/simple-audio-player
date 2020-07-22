@@ -114,25 +114,58 @@ class RepeatOnePlayStrategy extends PlayStrategy {
 /// 乱序播放策略：乱序、循环播放
 ///
 class ShufflePlayStrategy extends RepeatPlayStrategy {
-  final Random _random = Random();
 
-  // 下一个不等于current的索引，除非只有1个
-  int get _nextRandomInt {
-    if(count<2) return current;
-    int index = current;
-    while(index==current) {
-     index = _random.nextInt(count);
+  final List<int> _todoList = [];   // 待播放列表
+  final List<int> _doneList = [];   // 已播放，实现上一首功能
+  void _initList() {
+    // 构建新的待放列表
+    _todoList.clear();
+    for(var i=0;i<count;i++) _todoList.add(i);
+    _todoList.shuffle();
+
+    // 裁剪超长的已播放列表
+    int overLong = _doneList.length - count;
+    if(overLong>0) {
+      _doneList.removeRange(0, overLong);
     }
+
+    // 优化：下一首待放，如果刚刚放过，就移到最后
+    if(_doneList.length>0 && _todoList.length>1 && _todoList.last==_doneList.last) {
+      int i = _todoList.removeLast();
+      _todoList.insert(0, i);
+    }
+
+    print('_todoList: '+_todoList.toString());
+    print('_doneList: '+_doneList.toString());
+  }
+
+  // 下一个
+  int get _nextRandomInt {
+    if(_todoList.length==0) _initList();
+    if(_todoList.length==0) return -1;
+
+    int index = _todoList.removeLast();
+    _doneList.add(index);
+
     return index;
   }
-  
+
+  // 上一个
+  int get _previousIndex {
+    if(_doneList.length<=0) return -1;
+    return _doneList.removeLast();
+  }
+
   ShufflePlayStrategy(PlayListInterface playList) : super(playList);
+
+  @override
+  bool canPrevious() => count>0 && _doneList.length>0;
 
   @override
   int next() => canNext()?_nextRandomInt:-1;
 
   @override
-  int previous() => canPrevious()?((current - 1)<0 ? (count-1) : ((current - 1) % count)):-1;
+  int previous() => canPrevious()?_previousIndex:-1;
 
   @override
   int play() {

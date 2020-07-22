@@ -14,3 +14,15 @@ A few resources to get you started if this is your first Flutter project:
 For help getting started with Flutter, view our
 [online documentation](https://flutter.dev/docs), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
+
+todo:
+<del>
+* shuffle优化
+* play panel play按钮显示不匹配
+</del>
+* playlist 移除音轨
+* 选择playlist
+* 最近打开的playlist
+* 记录当前音轨，下次打开时默认为这个
+
+* playlist音轨文件路径：相对路径

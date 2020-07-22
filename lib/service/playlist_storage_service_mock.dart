@@ -18,7 +18,7 @@ class MockPlaylistStorageService implements PlaylistStorageService {
     String name = filename.substring(0,filename.lastIndexOf("."));
     print(name);
 
-    PlayList playList=PlayList(name, []);
+    PlayList playList=PlayList(filepath, name, []);
     return playList;
   }
 
