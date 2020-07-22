@@ -19,8 +19,10 @@ todo:
 <del>
 * shuffle优化
 * play panel play按钮显示不匹配
-</del>
 * playlist 移除音轨
+* 添加选择多个音频文件
+</del>
+* 添加选择文件夹
 * 选择playlist
 * 最近打开的playlist
 * 记录当前音轨，下次打开时默认为这个

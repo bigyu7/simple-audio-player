@@ -45,5 +45,10 @@ class PlayList {
     _traces.add(item);
     return true;
   }
+
+  PlayListItem removePlayListItemAt(int index) {
+    if(_traces.length==0 || index<0 || index>=_traces.length) return null;
+    return _traces.removeAt(index);
+  }
 }
 

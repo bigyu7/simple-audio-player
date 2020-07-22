@@ -2,6 +2,7 @@ import 'dart:async';
 //import 'dart:io';
 //import 'dart:typed_data';
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -120,18 +121,23 @@ class _PlayListPageState extends State<PlayListPage> {
   }
 
   Future _addToPlayList() async {
-    var path;
+    Map<String,String> filesPaths;
     try {
-      path = await FilePicker.getFilePath(
+      filesPaths = await FilePicker.getMultiFilePath(
         type: FileType.audio,
       );
     } on PlatformException catch (e) {
       print("Unsupported operation" + e.toString());
     }
-    if (path==null) return;
+    if (filesPaths==null) return;
     if (!mounted) return;
 
-    _playListModel.add(PlayListItem(path, path.split('/').last, null));
+    filesPaths.forEach((name, path) {
+//      _playListModel.add(PlayListItem(path, path.split('/').last, null));
+      print('key: '+name+' value: '+path);
+      _playListModel.add(PlayListItem(path, name, null));
+    });
+
 
   }
 
@@ -146,20 +152,49 @@ class _PlayListView extends StatelessWidget {
 
     return ListView.builder(
       itemCount: _playList.traces.length,
-      itemBuilder: (context, index) => ListTile(
-        onTap: () {
-          _playList.playIndex(index);
-        },
-        leading: _playList.isCurrentTrace(index) ? Icon(Icons.volume_up,color: activedItemNameStyle.color):Icon(Icons.play_arrow),
-        title: Text(
-          _playList.traces[index].title,
-          style: _playList.isCurrentTrace(index) ? activedItemNameStyle : itemNameStyle,
-        ),
+      itemBuilder: (context, index)  {
+        final item = _playList.traces[index];
+        return Dismissible(
+          key: Key(item.file),
+          // crossAxisEndOffset: 1.0,
+          // secondaryBackground: Container(color: Colors.pink),
+          dragStartBehavior: DragStartBehavior.down,
+          direction: DismissDirection.endToStart,
+          background: Container(
+            padding: const EdgeInsets.only(right: 30),
+            alignment: Alignment.centerRight,
+            color: Colors.red,
+            child: Text(
+              '向左滑动移除音轨',
+              style: TextStyle(fontSize: 16, color: Colors.white),
+            ),
+          ),
+          onDismissed: (direction) {
+            _playList.removePlayListItemAt(index);
+//            print(_list.length);
+            Scaffold.of(context).hideCurrentSnackBar();
+            Scaffold.of(context).showSnackBar(SnackBar(
+              content: Text('移除成功'),
+            ));
+          },
+
+          child: ListTile(
+            onTap: () {
+              _playList.playIndex(index);
+            },
+            leading: _playList.isCurrentTrace(index) ? Icon(Icons.volume_up,color: activedItemNameStyle.color):Icon(Icons.play_arrow),
+            title: Text(
+              item.title,
+              style: _playList.isCurrentTrace(index) ? activedItemNameStyle : itemNameStyle,
+            ),
 //        subtitle: Text(
 //          _playList.traces[index].file,
 //          //style: itemNameStyle,
 //        ),
-      ),
+          ),
+
+        );
+      },
     );
   }
 }

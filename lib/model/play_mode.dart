@@ -32,6 +32,10 @@ abstract class PlayStrategy {
   bool canPrevious();
   bool canNext();
   bool canPlay();
+
+  void reset() {}
+
+  void onItemRemovedAt(int index) {}
 }
 
 ///
@@ -172,4 +176,16 @@ class ShufflePlayStrategy extends RepeatPlayStrategy {
     if(!canPlay()) return -1;
     return _nextRandomInt;
   }
+
+  @override
+  void reset() {
+    _todoList.clear();
+    _doneList.clear();
+  }
+
+  @override
+  void onItemRemovedAt(int index) {
+    reset();
+  }
+
 }

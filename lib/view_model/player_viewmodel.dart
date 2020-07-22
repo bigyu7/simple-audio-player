@@ -105,6 +105,11 @@ class PlayerViewModel extends ChangeNotifier {
     }
   }
 
+  Future reset() async {
+    _localFilePath = '';
+    stop();
+  }
+
   Future play() async {
     if(canPlay) {
       //print('play() - '+_localFilePath);

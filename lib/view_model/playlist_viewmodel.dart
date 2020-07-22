@@ -43,6 +43,7 @@ class PlayListViewModel extends ChangeNotifier implements PlayListInterface {
   PlayStrategy get playStrategy => _playStrategys[playMode.index%_playStrategys.length];
 
   void nextPlayMode() {
+    playStrategy.reset();
     PlayMode currentMode = playMode;
     int index = (currentMode.index + 1) % PlayMode.values.length;
     _playMode = PlayMode.values[index];
@@ -85,7 +86,7 @@ class PlayListViewModel extends ChangeNotifier implements PlayListInterface {
     if(newName==null||newName.isEmpty||newName==_playList.name) return;
     //_playList.name=newName;
 
-    print('** changeName() - '+_playList.name+' => '+newName);
+    //print('** changeName() - '+_playList.name+' => '+newName);
 
     await _playListStorageService.renamePlayList(_playList, newName);
     await _saveConfig();
@@ -143,6 +144,33 @@ class PlayListViewModel extends ChangeNotifier implements PlayListInterface {
     } else {
       play();
     }
+  }
+
+  ///
+  /// 移除index位置处的playlistitem
+  Future removePlayListItemAt(int index) async {
+    PlayListItem item = _playList.removePlayListItemAt(index);
+    if(item==null) return;
+
+    // 通知strategy，可能需要调整
+    playStrategy.onItemRemovedAt(index);
+
+    // 如果是当前在播放的，停止并播放下一首
+    if(_currentTraceIndex==index) {
+      if(_playerViewModel.isPlaying && tracesCount() > 0) {
+        _playerViewModel.stop();
+        play();
+      } else {
+        _currentTraceIndex = -1;
+        _playerViewModel.reset();
+      }
+    } else if(index<_currentTraceIndex) {   // 如果是当前播放前面的，需要调整当前播放序号
+      _currentTraceIndex--;
+      if(_currentTraceIndex<0) _playerViewModel.reset();
+    }
+
+    _savePlayList();
+    notifyListeners();
   }
 
 }
