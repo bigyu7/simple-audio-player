@@ -31,7 +31,6 @@ class PlaylistStorageServiceImpl implements PlaylistStorageService {
   Future<PlayList> loadPlayList(String filePath) async {
     String filename = filePath.split('/').last;
     String name = filename.substring(0,filename.lastIndexOf("."));
-    print(name);
 
     PlayList playList=PlayList(filePath, name, []);
 
@@ -69,7 +68,9 @@ class PlaylistStorageServiceImpl implements PlaylistStorageService {
     String newFilePath = '$path/$newName$ext';
     print('new file path: '+newFilePath);
 
-    await file.rename(newFilePath);
+    if (await file.exists()) {
+      await file.rename(newFilePath);
+    }
     playList.filePath = newFilePath;
     playList.name = newName;
   }

@@ -14,8 +14,8 @@ class MockConfigStorageService implements ConfigStorageService {
   @override
   Future<Config> loadConfig() async {
     final path = await _localPath;
-    final Config config=Config();
-    config.playListFilePath='$path/默认播放列表.m3u';
+    Config config=Config();
+    config.setCurrentPlayList('$path/默认播放列表.m3u');
     print('loadConfig(): '+config.toString());
     return config;
   }
@@ -23,6 +23,12 @@ class MockConfigStorageService implements ConfigStorageService {
   @override
   Future<void> saveConfig(Config config) async {
     print('saveConfig(): '+config.toString());
+  }
+
+  @override
+  Future<String> newPlayListFilePath() {
+    // TODO: implement newPlayListFilePath
+    throw UnimplementedError();
   }
 
 }

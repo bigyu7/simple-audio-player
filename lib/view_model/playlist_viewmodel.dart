@@ -12,15 +12,16 @@ class PlayListViewModel extends ChangeNotifier implements PlayListInterface {
   final PlaylistStorageService _playListStorageService = serviceLocator<PlaylistStorageService>();
   final PlayerViewModel _playerViewModel = serviceLocator<PlayerViewModel>();
   final List<PlayStrategy> _playStrategys = [];
+  Config _config = Config();
 
   PlayList _playList;
   //String _playListFilePath;
 
-  int _currentTraceIndex;
-  PlayMode _playMode;
+  //int _currentTraceIndex;
+//  PlayMode _playMode;
 
   PlayListViewModel() {
-    _currentTraceIndex=-1;
+    //_currentTraceIndex=-1;
     _playStrategys.add(InOrderPlayStrategy(this));
     _playStrategys.add(RepeatPlayStrategy(this));
     _playStrategys.add(RepeatOnePlayStrategy(this));
@@ -32,21 +33,29 @@ class PlayListViewModel extends ChangeNotifier implements PlayListInterface {
 
   get isPlaying => _playerViewModel.isPlaying;
 
+  bool get hasRecentPlayList => _config.hasRecentPlayList;
+  List<String> get recentPlayLists => _config.recentPlayLists;
+
   @override
   int tracesCount() => _playList==null?0:_playList.tracesCount;
 
   @override
-  int currentTraceIndex() => _currentTraceIndex??-1;
-  bool isCurrentTrace(int index) => _currentTraceIndex==index;
+  int currentTraceIndex() => _config.currentTraceIndex??-1;
+  bool isCurrentTrace(int index) => _config.currentTraceIndex==index;
 
-  PlayMode get playMode => _playMode??PlayMode.in_order;
+  set _currentTraceIndex(int index) => _config.currentTraceIndex=index;
+  int get _currentTraceIndex => _config.currentTraceIndex??-1;
+
+  PlayMode get playMode => _config.playMode;
+  set playMode(PlayMode mode) => _config.playMode=mode;
+
   PlayStrategy get playStrategy => _playStrategys[playMode.index%_playStrategys.length];
 
   void nextPlayMode() {
     playStrategy.reset();
     PlayMode currentMode = playMode;
     int index = (currentMode.index + 1) % PlayMode.values.length;
-    _playMode = PlayMode.values[index];
+    playMode = PlayMode.values[index];
     notifyListeners();
     _saveConfig();
   }
@@ -59,8 +68,11 @@ class PlayListViewModel extends ChangeNotifier implements PlayListInterface {
     }
   }
 
-  Future<PlayList> _loadPlayListFromFile(String playListFilePath) async {
+  Future<PlayList> loadPlayListFromFile(String playListFilePath) async {
     _playList = await _playListStorageService.loadPlayList(playListFilePath);
+
+    if(_config.setCurrentPlayList(_playList.filePath)) _saveConfig();
+
     notifyListeners();
     return _playList;
   }
@@ -70,16 +82,13 @@ class PlayListViewModel extends ChangeNotifier implements PlayListInterface {
   }
 
   Future loadFromConfig() async {
-    Config config = await _configStorageService.loadConfig();
-    _playMode = config.playMode;
-    return _loadPlayListFromFile(config.playListFilePath);
+    _config = await _configStorageService.loadConfig();
+    return loadPlayListFromFile(_config.playListFilePath);
   }
 
   Future _saveConfig() async {
-    Config config = Config();
-    config.playMode = this.playMode;
-    config.playListFilePath = _playList.filePath;
-    await _configStorageService.saveConfig(config);
+    _config.setCurrentPlayList(_playList.filePath);
+    await _configStorageService.saveConfig(_config);
   }
 
   Future changeName(String newName) async {
@@ -89,6 +98,9 @@ class PlayListViewModel extends ChangeNotifier implements PlayListInterface {
     //print('** changeName() - '+_playList.name+' => '+newName);
 
     await _playListStorageService.renamePlayList(_playList, newName);
+
+    _config.renameCerrentPlayList(_playList.filePath);
+
     await _saveConfig();
     notifyListeners();
   }
@@ -105,6 +117,7 @@ class PlayListViewModel extends ChangeNotifier implements PlayListInterface {
 
     _playerViewModel.playLocalFile(item.file, this.next);
     notifyListeners();
+    _saveConfig();
   }
 
   void play() {
@@ -171,6 +184,12 @@ class PlayListViewModel extends ChangeNotifier implements PlayListInterface {
 
     _savePlayList();
     notifyListeners();
+  }
+
+  // 创建一个新的播放列表
+  Future newPlayList() async {
+    String filePath = await _configStorageService.newPlayListFilePath();
+    return loadPlayListFromFile(filePath);
   }
 
 }

@@ -1,5 +1,6 @@
 
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -9,6 +10,7 @@ import 'config_storage_service.dart';
 
 class ConfigStorageServiceImpl implements ConfigStorageService {
   static const sharedPrefConfigKey = 'config';
+  static const defaultPlayListName = '默认播放列表';
 
   Future<void> _save(String key, String value) async {
     final prefs = await SharedPreferences.getInstance();
@@ -27,24 +29,25 @@ class ConfigStorageServiceImpl implements ConfigStorageService {
 
   Future<String> get _defaultPlayListFilePath async {
     final path = await _localPath;
-    return '$path/默认播放列表.m3u';
+    return '$path/$defaultPlayListName.m3u';
   }
 
   @override
   Future<Config> loadConfig() async {
     String jsonString = await _read(sharedPrefConfigKey);
+    print('loadConfig() raw string: '+jsonString);
     Config config;
     if (jsonString == '') {
       config = Config();
-      config.playListFilePath = await _defaultPlayListFilePath;
+      config.setCurrentPlayList(await _defaultPlayListFilePath);
     } else {
       final codeList = jsonDecode(jsonString);
       config = Config.fromJson(codeList);
       if(config.isEmptyPlayListFilePath) {
-        config.playListFilePath = await _defaultPlayListFilePath;
+        config.setCurrentPlayList(await _defaultPlayListFilePath);
       }
     }
-    print('loadConfig(): '+config.toString());
+    print('loadConfig() config: '+config.toString());
     return config;
   }
 
@@ -53,6 +56,18 @@ class ConfigStorageServiceImpl implements ConfigStorageService {
     String jsonString = jsonEncode(config.toJson());
     print('saveConfig(): '+jsonString);
     return _save(sharedPrefConfigKey, jsonString);
+  }
+
+  @override
+  Future<String> newPlayListFilePath() async {
+    final path = await _localPath;
+    String filePath = '$path/$defaultPlayListName.m3u';
+    int i=0;
+    while (await File(filePath).exists()) {
+      i++;
+      filePath = '$path/$defaultPlayListName$i.m3u';
+    }
+    return filePath;
   }
   
 }

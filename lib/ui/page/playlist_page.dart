@@ -48,14 +48,16 @@ class _PlayListPageState extends State<PlayListPage> {
       ],
       child: Scaffold(
         appBar: AppBar(
-          leading: IconButton(
+          leading: PopupMenuButton<String>(
             icon: Icon(Icons.menu),
-            tooltip: 'Navigation menu',
-            onPressed: null,
+            onSelected: (String value) => _choosePlayList(value) ,
+            itemBuilder: (BuildContext context) => _buildPlayListPopupMenuEntry(context),
           ),
+
           title: Consumer<PlayListViewModel>(
             builder: (context, playList, child) => _buidAppBarTitle(playList),
           ),
+
           actions: <Widget>[
             IconButton(
               icon: Icon(Icons.add),
@@ -83,6 +85,73 @@ class _PlayListPageState extends State<PlayListPage> {
       ),
     );
 
+  }
+
+  List<PopupMenuEntry<String>> _buildPlayListPopupMenuEntry(BuildContext context) {
+    List<PopupMenuEntry<String>> items = [];
+
+    items.add(
+        PopupMenuItem<String>(
+          value: 'new',
+          child: Text('新建播放列表'),
+        )
+    );
+    items.add(
+        PopupMenuItem<String>(
+          value: 'choose',
+          child: Text('选择播放列表'),
+        )
+    );
+
+    if(_playListModel.hasRecentPlayList) {
+      items.add(PopupMenuDivider());
+      _playListModel.recentPlayLists.reversed.forEach((filePath) {
+
+        String filename = filePath.split('/').last;
+        String name = filename.substring(0,filename.lastIndexOf("."));
+
+        items.add(
+            PopupMenuItem<String>(
+              value: filePath,
+              child: Text(name),
+            )
+        );
+      });
+    }
+
+    return items;
+  }
+
+  void _choosePlayList(String type) async {
+    print('_choosePlayList: '+type);
+    switch(type) {
+      case 'new':     // 创建一个新的播放列表
+        setState(() {
+          _playListModel.newPlayList();
+        });
+        break;
+      case 'choose':    // 选择一个.m3u文件
+        String filesPath;
+        try {
+          filesPath = await FilePicker.getFilePath(
+            type: FileType.custom,
+            allowedExtensions: ['m3u'],
+          );
+        } on PlatformException catch (e) {
+          print("Unsupported operation" + e.toString());
+        }
+        if (filesPath==null) return;
+        if (!mounted) return;
+        setState(() {
+          _playListModel.loadPlayListFromFile(filesPath);
+        });
+        break;
+      default:
+        setState(() {
+          _playListModel.loadPlayListFromFile(type);
+        });
+        break;
+    }
   }
 
   Widget _buidAppBarTitle(PlayListViewModel playList) {

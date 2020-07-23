@@ -21,10 +21,16 @@ todo:
 * play panel play按钮显示不匹配
 * playlist 移除音轨
 * 添加选择多个音频文件
-</del>
-* 添加选择文件夹
+
+* 新建playlist
 * 选择playlist
 * 最近打开的playlist
+* 重构Config
+
+
 * 记录当前音轨，下次打开时默认为这个
+</del>
+
+修正app名字和图标
 
 * playlist音轨文件路径：相对路径
