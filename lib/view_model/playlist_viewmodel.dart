@@ -1,11 +1,11 @@
 import 'package:flutter/foundation.dart';
-import 'package:simply_audio_player/model/config.dart';
-import 'package:simply_audio_player/model/play_mode.dart';
-import 'package:simply_audio_player/model/playlist.dart';
-import 'package:simply_audio_player/service/config_storage_service.dart';
-import 'package:simply_audio_player/service/playlist_storege_service.dart';
-import 'package:simply_audio_player/service/service_locator.dart';
-import 'package:simply_audio_player/view_model/player_viewmodel.dart';
+import 'package:simple_audio_player/model/config.dart';
+import 'package:simple_audio_player/model/play_mode.dart';
+import 'package:simple_audio_player/model/playlist.dart';
+import 'package:simple_audio_player/service/config_storage_service.dart';
+import 'package:simple_audio_player/service/playlist_storege_service.dart';
+import 'package:simple_audio_player/service/service_locator.dart';
+import 'package:simple_audio_player/view_model/player_viewmodel.dart';
 
 class PlayListViewModel extends ChangeNotifier implements PlayListInterface {
   final ConfigStorageService _configStorageService = serviceLocator<ConfigStorageService>();
@@ -26,6 +26,7 @@ class PlayListViewModel extends ChangeNotifier implements PlayListInterface {
     _playStrategys.add(RepeatPlayStrategy(this));
     _playStrategys.add(RepeatOnePlayStrategy(this));
     _playStrategys.add(ShufflePlayStrategy(this));
+    _playStrategys.add(OnlyOnePlayStrategy(this));
   }
 
   List<PlayListItem> get traces => _playList==null?[]:_playList.traces;

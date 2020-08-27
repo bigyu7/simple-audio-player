@@ -2,7 +2,7 @@
 
 import 'dart:math';
 
-enum PlayMode { in_order, repeat, repeat_one,  shuffle}
+enum PlayMode { in_order, repeat, repeat_one,  shuffle, only_one}
 
 String enumToString(o) => o.toString().split('.').last;
 
@@ -104,6 +104,36 @@ class RepeatOnePlayStrategy extends PlayStrategy {
 
   @override
   int previous() => canPrevious()?current:-1;
+
+  @override
+  int play() {
+    if(!canPlay()) return -1;
+    if(current<0) return 0;
+    if(current>=count) return count-1;
+    return current;
+  }
+}
+
+///
+/// 只播放一首策略
+///
+class OnlyOnePlayStrategy extends PlayStrategy {
+  OnlyOnePlayStrategy(PlayListInterface playList) : super(playList);
+
+  @override
+  bool canPrevious() => false;
+
+  @override
+  bool canNext() => false;
+
+  @override
+  bool canPlay() => count>0;
+
+  @override
+  int next() => -1;
+
+  @override
+  int previous() => canPlay()?current:-1;
 
   @override
   int play() {

@@ -1,6 +1,6 @@
 
 import 'package:path_provider/path_provider.dart';
-import 'package:simply_audio_player/model/config.dart';
+import 'package:simple_audio_player/model/config.dart';
 
 import 'config_storage_service.dart';
 

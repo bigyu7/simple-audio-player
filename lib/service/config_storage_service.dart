@@ -1,5 +1,5 @@
 
-import 'package:simply_audio_player/model/config.dart';
+import 'package:simple_audio_player/model/config.dart';
 
 abstract class ConfigStorageService {
   Future<Config> loadConfig();

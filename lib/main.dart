@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'package:simply_audio_player/service/service_locator.dart';
-import 'package:simply_audio_player/ui/page/playlist_page.dart';
+import 'package:simple_audio_player/service/service_locator.dart';
+import 'package:simple_audio_player/ui/page/playlist_page.dart';
 
 void main() {
   setupServiceLocator();
@@ -28,7 +28,7 @@ class MyApp extends StatelessWidget {
         textTheme: TextTheme(
           //headline1: TextStyle(fontSize: 72.0, fontWeight: FontWeight.bold),
           //headline6: TextStyle(fontSize: 36.0, fontStyle: FontStyle.italic),
-          bodyText1: TextStyle(fontWeight: FontWeight.bold, color: Colors.red, fontStyle: FontStyle.italic),
+          bodyText1: TextStyle(fontWeight: FontWeight.bold, color: Colors.red),
           //bodyText2: TextStyle(fontSize: 14.0, fontFamily: 'Hind'),
         ),
       ),

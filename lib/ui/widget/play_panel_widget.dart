@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:simply_audio_player/model/play_mode.dart';
-import 'package:simply_audio_player/view_model/player_viewmodel.dart';
-import 'package:simply_audio_player/view_model/playlist_viewmodel.dart';
+import 'package:simple_audio_player/model/play_mode.dart';
+import 'package:simple_audio_player/view_model/player_viewmodel.dart';
+import 'package:simple_audio_player/view_model/playlist_viewmodel.dart';
 
 class PlayPanel extends StatelessWidget {
 
@@ -16,6 +16,8 @@ class PlayPanel extends StatelessWidget {
         return Icons.repeat_one;
       case PlayMode.shuffle:
         return Icons.shuffle;
+      case PlayMode.only_one:
+        return Icons.looks_one;
     }
     return Icons.playlist_play;
   }

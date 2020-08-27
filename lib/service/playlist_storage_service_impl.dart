@@ -4,8 +4,8 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:path_provider/path_provider.dart';
-import 'package:simply_audio_player/model/playlist.dart';
-import 'package:simply_audio_player/service/playlist_storege_service.dart';
+import 'package:simple_audio_player/model/playlist.dart';
+import 'package:simple_audio_player/service/playlist_storege_service.dart';
 
 class PlaylistStorageServiceImpl implements PlaylistStorageService {
 //

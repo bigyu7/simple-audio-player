@@ -1,7 +1,7 @@
 
 import 'dart:convert';
 
-import 'package:simply_audio_player/model/play_mode.dart';
+import 'package:simple_audio_player/model/play_mode.dart';
 
 class Config {
   static const int recentCount = 10;    // max recent playlist count

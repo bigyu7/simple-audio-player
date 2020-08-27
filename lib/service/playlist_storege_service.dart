@@ -1,5 +1,5 @@
 
-import 'package:simply_audio_player/model/playlist.dart';
+import 'package:simple_audio_player/model/playlist.dart';
 
 abstract class PlaylistStorageService {
   Future<PlayList> loadPlayList(String filepath);

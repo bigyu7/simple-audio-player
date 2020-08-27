@@ -7,11 +7,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:simply_audio_player/model/playlist.dart';
-import 'package:simply_audio_player/service/service_locator.dart';
-import 'package:simply_audio_player/view_model/playlist_viewmodel.dart';
-import 'package:simply_audio_player/ui/widget/play_panel_widget.dart';
-import 'package:simply_audio_player/view_model/player_viewmodel.dart';
+import 'package:simple_audio_player/model/playlist.dart';
+import 'package:simple_audio_player/service/service_locator.dart';
+import 'package:simple_audio_player/view_model/playlist_viewmodel.dart';
+import 'package:simple_audio_player/ui/widget/play_panel_widget.dart';
+import 'package:simple_audio_player/view_model/player_viewmodel.dart';
 
 class PlayListPage extends StatefulWidget {
   @override
@@ -249,7 +249,9 @@ class _PlayListView extends StatelessWidget {
 
           child: ListTile(
             onTap: () {
-              _playList.playIndex(index);
+              if( _playList.isCurrentTrace(index))
+                _playList.playOrPause();
+              else _playList.playIndex(index);
             },
             leading: _playList.isCurrentTrace(index) ? Icon(Icons.volume_up,color: activedItemNameStyle.color):Icon(Icons.play_arrow),
             title: Text(
