@@ -219,6 +219,58 @@ class _PlayListView extends StatelessWidget {
     var activedItemNameStyle = Theme.of(context).textTheme.bodyText1;
     var _playList = Provider.of<PlayListViewModel>(context);
 
+    return ReorderableListView(
+      children: _playList.traces.asMap().map((index, item) => MapEntry(index,
+          Dismissible(
+            key: Key(item.file),
+            // crossAxisEndOffset: 1.0,
+            // secondaryBackground: Container(color: Colors.pink),
+            dragStartBehavior: DragStartBehavior.down,
+            direction: DismissDirection.endToStart,
+            background: Container(
+              padding: const EdgeInsets.only(right: 30),
+              alignment: Alignment.centerRight,
+              color: Colors.red,
+              child: Text(
+                '向左滑动移除音轨',
+                style: TextStyle(fontSize: 16, color: Colors.white),
+              ),
+            ),
+            onDismissed: (direction) {
+              _playList.removePlayListItemAt(index);
+    //            print(_list.length);
+              Scaffold.of(context).hideCurrentSnackBar();
+              Scaffold.of(context).showSnackBar(SnackBar(
+                content: Text('移除成功'),
+              ));
+            },
+            child: ListTile(
+              onTap: () {
+                if( _playList.isCurrentTrace(index))
+                  _playList.playOrPause();
+                else _playList.playIndex(index);
+              },
+              leading: _playList.isCurrentTrace(index) ? Icon(Icons.volume_up,color: activedItemNameStyle.color):Icon(Icons.play_arrow),
+              title: Text(
+                item.title,
+                style: _playList.isCurrentTrace(index) ? activedItemNameStyle : itemNameStyle,
+              ),
+    //        subtitle: Text(
+    //          _playList.traces[index].file,
+    //          //style: itemNameStyle,
+    //        ),
+            ),
+
+          )
+        )).values.toList(),
+
+      onReorder: (int oldIndex, int newIndex) {
+//        print("onReorder: $oldIndex --- $newIndex");
+        _playList.reorderPlayListItem(oldIndex, newIndex);
+      },
+    );
+
+/*
     return ListView.builder(
       itemCount: _playList.traces.length,
       itemBuilder: (context, index)  {
@@ -263,9 +315,12 @@ class _PlayListView extends StatelessWidget {
 //          //style: itemNameStyle,
 //        ),
           ),
-
         );
+
       },
     );
+*/
+
+
   }
 }

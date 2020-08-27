@@ -193,4 +193,28 @@ class PlayListViewModel extends ChangeNotifier implements PlayListInterface {
     return loadPlayListFromFile(filePath);
   }
 
+  // 更改音轨在播放列表的位置
+  Future reorderPlayListItem(int oldIndex, int newIndex) {
+    if(oldIndex==newIndex) return null;
+    newIndex = _playList.reorderPlayListItem(oldIndex, newIndex);
+    if(newIndex<0) return null;
+
+    // 修正当前播放位置
+    int current = _currentTraceIndex;
+
+    if(current>=0) {    // 有效当前播放位置，才需要修正
+      if(current==oldIndex) _currentTraceIndex=newIndex;
+      // 从前面移到后面，则当前位置要-1
+      else if(current<=newIndex && oldIndex<current ) _currentTraceIndex=current-1;
+      // 从后面移到前面，则当前位置要+1
+      else if(current>=newIndex && oldIndex>current ) _currentTraceIndex=current+1;
+    }
+//    int nc = _currentTraceIndex;
+//    print("reorderPlayListItem: $oldIndex -> $newIndex, current: $current -> $nc");
+
+    _savePlayList();
+    _saveConfig();
+    notifyListeners();
+  }
+
 }

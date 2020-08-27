@@ -50,5 +50,21 @@ class PlayList {
     if(_traces.length==0 || index<0 || index>=_traces.length) return null;
     return _traces.removeAt(index);
   }
+
+  /**
+   * 调整在列表中的位置
+   * 返回新位置
+   */
+  int reorderPlayListItem(int oldIndex, int newIndex) {
+    if(_traces.length==0 || oldIndex<0 || oldIndex>=_traces.length) return -1;
+
+    if(oldIndex < newIndex) {
+      newIndex -= 1;
+    }
+
+    PlayListItem temp = _traces.removeAt(oldIndex);
+    _traces.insert(newIndex, temp);
+    return newIndex;
+  }
 }
 
