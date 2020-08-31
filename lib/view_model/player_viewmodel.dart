@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ffi';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
@@ -47,6 +48,22 @@ class PlayerViewModel extends ChangeNotifier {
 
   get duration => _duration;
   get position => _position;
+
+  double getMaxPosition() {
+    if(_duration!=null) {
+      int m = _duration.inMilliseconds;
+      if(m!=null && m>=0) return m.toDouble();
+    }
+    return 10.0;
+  }
+
+  double getPositionValue() {
+    if(_position!=null) {
+      int m = _position.inMilliseconds;
+      if(m!=null && m>=0) return m.toDouble();
+    }
+    return 0.0;
+  }
 
   void initAudioPlayer() {
     _audioPlayer = AudioPlayer();

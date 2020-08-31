@@ -27,6 +27,7 @@ class PlayListViewModel extends ChangeNotifier implements PlayListInterface {
     _playStrategys.add(RepeatOnePlayStrategy(this));
     _playStrategys.add(ShufflePlayStrategy(this));
     _playStrategys.add(OnlyOnePlayStrategy(this));
+    _playStrategys.add(OnlyNPlayStrategy(this,2));
   }
 
   List<PlayListItem> get traces => _playList==null?[]:_playList.traces;
@@ -43,6 +44,7 @@ class PlayListViewModel extends ChangeNotifier implements PlayListInterface {
   @override
   int currentTraceIndex() => _config.currentTraceIndex??-1;
   bool isCurrentTrace(int index) => _config.currentTraceIndex==index;
+  bool willPlay(int index) => playStrategy.inPlayList(index);
 
   set _currentTraceIndex(int index) => _config.currentTraceIndex=index;
   int get _currentTraceIndex => _config.currentTraceIndex??-1;
@@ -53,10 +55,10 @@ class PlayListViewModel extends ChangeNotifier implements PlayListInterface {
   PlayStrategy get playStrategy => _playStrategys[playMode.index%_playStrategys.length];
 
   void nextPlayMode() {
-    playStrategy.reset();
     PlayMode currentMode = playMode;
     int index = (currentMode.index + 1) % PlayMode.values.length;
     playMode = PlayMode.values[index];
+    playStrategy.reset();
     notifyListeners();
     _saveConfig();
   }
@@ -104,6 +106,13 @@ class PlayListViewModel extends ChangeNotifier implements PlayListInterface {
 
     await _saveConfig();
     notifyListeners();
+  }
+
+  void playIndexAndResetStrategy(int index) {
+    playIndex(index);
+    if(playMode==PlayMode.only_two) {
+      playStrategy.reset();
+    }
   }
 
   void playIndex(int index) {

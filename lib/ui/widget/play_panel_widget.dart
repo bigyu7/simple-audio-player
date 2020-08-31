@@ -18,6 +18,8 @@ class PlayPanel extends StatelessWidget {
         return Icons.shuffle;
       case PlayMode.only_one:
         return Icons.looks_one;
+      case PlayMode.only_two:
+        return Icons.looks_two;
     }
     return Icons.playlist_play;
   }
@@ -66,12 +68,14 @@ class PlayPanel extends StatelessWidget {
                       Text('${player.positionText}'),
                       Expanded(
                         child: Slider(
-                            value: player.position?.inMilliseconds?.toDouble() ?? 0.0,
+                            value: player.getPositionValue(),
+//                          value: player.position?.inMilliseconds?.toDouble() ?? 0.0,
                             onChanged: (double value) {
                               return player.seek((value / 1000).roundToDouble());
                             },
                             min: 0.0,
-                            max: player.duration?.inMilliseconds?.toDouble() ?? 10.0,
+                            max: player.getMaxPosition(),
+//                            max: player.duration?.inMilliseconds?.toDouble() ?? 10.0,
                         ),
                       ),
                       Text('${player.durationText}'),

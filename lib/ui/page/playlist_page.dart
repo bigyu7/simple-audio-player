@@ -248,9 +248,9 @@ class _PlayListView extends StatelessWidget {
               onTap: () {
                 if( _playList.isCurrentTrace(index))
                   _playList.playOrPause();
-                else _playList.playIndex(index);
+                else _playList.playIndexAndResetStrategy(index);
               },
-              leading: _playList.isCurrentTrace(index) ? Icon(Icons.volume_up,color: activedItemNameStyle.color):Icon(Icons.play_arrow),
+              leading: _playList.isCurrentTrace(index) ? Icon(Icons.volume_up,color: activedItemNameStyle.color) : (_playList.willPlay(index) ? Icon(Icons.play_arrow):Icon(Icons.block)),
               title: Text(
                 item.title,
                 style: _playList.isCurrentTrace(index) ? activedItemNameStyle : itemNameStyle,
@@ -269,57 +269,6 @@ class _PlayListView extends StatelessWidget {
         _playList.reorderPlayListItem(oldIndex, newIndex);
       },
     );
-
-/*
-    return ListView.builder(
-      itemCount: _playList.traces.length,
-      itemBuilder: (context, index)  {
-        final item = _playList.traces[index];
-        return Dismissible(
-          key: Key(item.file),
-          // crossAxisEndOffset: 1.0,
-          // secondaryBackground: Container(color: Colors.pink),
-          dragStartBehavior: DragStartBehavior.down,
-          direction: DismissDirection.endToStart,
-          background: Container(
-            padding: const EdgeInsets.only(right: 30),
-            alignment: Alignment.centerRight,
-            color: Colors.red,
-            child: Text(
-              '向左滑动移除音轨',
-              style: TextStyle(fontSize: 16, color: Colors.white),
-            ),
-          ),
-          onDismissed: (direction) {
-            _playList.removePlayListItemAt(index);
-//            print(_list.length);
-            Scaffold.of(context).hideCurrentSnackBar();
-            Scaffold.of(context).showSnackBar(SnackBar(
-              content: Text('移除成功'),
-            ));
-          },
-
-          child: ListTile(
-            onTap: () {
-              if( _playList.isCurrentTrace(index))
-                _playList.playOrPause();
-              else _playList.playIndex(index);
-            },
-            leading: _playList.isCurrentTrace(index) ? Icon(Icons.volume_up,color: activedItemNameStyle.color):Icon(Icons.play_arrow),
-            title: Text(
-              item.title,
-              style: _playList.isCurrentTrace(index) ? activedItemNameStyle : itemNameStyle,
-            ),
-//        subtitle: Text(
-//          _playList.traces[index].file,
-//          //style: itemNameStyle,
-//        ),
-          ),
-        );
-
-      },
-    );
-*/
 
 
   }

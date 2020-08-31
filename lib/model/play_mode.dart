@@ -2,7 +2,7 @@
 
 import 'dart:math';
 
-enum PlayMode { in_order, repeat, repeat_one,  shuffle, only_one}
+enum PlayMode { in_order, repeat, repeat_one,  shuffle, only_one, only_two}
 
 String enumToString(o) => o.toString().split('.').last;
 
@@ -32,6 +32,7 @@ abstract class PlayStrategy {
   bool canPrevious();
   bool canNext();
   bool canPlay();
+  bool inPlayList(int index);
 
   void reset() {}
 
@@ -66,6 +67,9 @@ class InOrderPlayStrategy extends PlayStrategy {
     if(current>=count) return count-1;
     return current;
   }
+
+  @override
+  bool inPlayList(int index) => index>=0 && index<count;
 }
 
 ///
@@ -112,6 +116,9 @@ class RepeatOnePlayStrategy extends PlayStrategy {
     if(current>=count) return count-1;
     return current;
   }
+
+  @override
+  bool inPlayList(int index) => index==current;
 }
 
 ///
@@ -142,6 +149,9 @@ class OnlyOnePlayStrategy extends PlayStrategy {
     if(current>=count) return count-1;
     return current;
   }
+
+  @override
+  bool inPlayList(int index) => index==current;
 }
 
 ///
@@ -219,3 +229,51 @@ class ShufflePlayStrategy extends RepeatPlayStrategy {
   }
 
 }
+
+///
+/// 只顺序播放N首策略
+///
+class OnlyNPlayStrategy extends PlayStrategy {
+  int firstIndex;
+  int n;
+
+  OnlyNPlayStrategy(PlayListInterface playList, int n) : super(playList) {
+    this.n=n;
+    this.firstIndex=current;
+  }
+
+  @override
+  bool canPrevious() => n>0 && count>0 && current>this.firstIndex;
+
+  @override
+  bool canNext() => n>0 && count>0 && current<(count-1) && current<(this.firstIndex+n-1);
+
+  @override
+  bool canPlay() => n>0 && count>0;
+
+  @override
+  int next() => canNext()?((current - this.firstIndex + 1) % n + this.firstIndex ):-1;
+
+  @override
+  int previous() => canPrevious()?((current - this.firstIndex - 1) % n + this.firstIndex):-1;
+
+  @override
+  int play() {
+    print('OnlyNPlayStrategy play() - first: '+firstIndex.toString()+', n: '+n.toString());
+    if(!canPlay()) return -1;
+    if(this.firstIndex<0) this.firstIndex=0;
+    if(current<this.firstIndex) return this.firstIndex;
+    if(current>=(this.firstIndex+n)) return this.firstIndex+n-1;
+    return current;
+  }
+
+  @override
+  void reset() {
+    this.firstIndex=current;
+    print('OnlyNPlayStrategy reset() - first: '+firstIndex.toString()+', n: '+n.toString());
+  }
+
+  @override
+  bool inPlayList(int index) => index>=this.firstIndex && index<(this.firstIndex+n);
+}
+
